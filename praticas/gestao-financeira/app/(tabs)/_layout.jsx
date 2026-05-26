@@ -12,9 +12,11 @@ export default function TabsLayout() {
       screenOptions={{
         headerStyle: { backgroundColor: colors.primary },
         headerTintColor: colors.primaryContrast,
+        headerTitleStyle: { fontSize: 22},
         headerTitleAlign: "center",
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.inactive,
+        tabBarHideOnKeyboard: true,
         tabBarStyle: {
           height: 60,
           paddingTop: 5,

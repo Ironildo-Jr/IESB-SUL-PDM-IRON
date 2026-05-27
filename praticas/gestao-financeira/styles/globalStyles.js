@@ -59,4 +59,31 @@ export const globalStyles = StyleSheet.create({
     fontSize: 16,
     color: colors.negativesText,
   },
+  closeButton: {
+    marginTop: 16,
+    alignItems: "center",
+  },
+  closeButtonText: {
+    color: colors.primary,
+    fontSize: 16,
+    fontWeight: "700",
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: colors.primaryText,
+    marginBottom: 16,
+  },
+  overlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.4)",
+    justifyContent: "center",
+    padding: 20,
+  },
+  modalContainer: {
+    gap: 12,
+    borderRadius: 16,
+    padding: 20,
+    backgroundColor: colors.background,
+  },
 });

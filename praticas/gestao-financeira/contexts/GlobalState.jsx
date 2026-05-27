@@ -1,21 +1,53 @@
-import { getAsyncStorage } from "@/utils/AsyncStorage";
 import { createContext, useEffect, useState } from "react";
+import { getAsyncStorage, setAsyncStorage } from "../utils/AsyncStorage";
+import { categories as defaultCategories } from "../constants/categories";
 
 export const MoneyContext = createContext();
 
 export default function GlobalState({ children }) {
   const [transactions, setTransactions] = useState([]);
+  const [categories, setCategories] = useState(defaultCategories);
+  const [isHydrated, setIsHydrated] = useState(false);
 
   useEffect(() => {
-    const transactionsFromStorage = async () => {
+    const loadFromStorage = async () => {
       const storedTransactions = await getAsyncStorage("transactions");
-      setTransactions(storedTransactions); // Carrega as transações do AsyncStorage para o estado
+      const storedCategories = await getAsyncStorage("categories");
+
+      if (Array.isArray(storedTransactions)) {
+        setTransactions(storedTransactions);
+      }
+
+      if (Array.isArray(storedCategories) && storedCategories.length > 0) {
+        setCategories(storedCategories);
+      }
+
+      setIsHydrated(true);
     };
-    transactionsFromStorage();
+
+    loadFromStorage();
   }, []);
 
+  useEffect(() => {
+    if (!isHydrated) {
+      return;
+    }
+
+    setAsyncStorage("transactions", transactions);
+  }, [transactions, isHydrated]);
+
+  useEffect(() => {
+    if (!isHydrated) {
+      return;
+    }
+
+    setAsyncStorage("categories", categories);
+  }, [categories, isHydrated]);
+
   return (
-    <MoneyContext.Provider value={[transactions, setTransactions]}>
+    <MoneyContext.Provider
+      value={[transactions, setTransactions, categories, setCategories]}
+    >
       {children}
     </MoneyContext.Provider>
   );

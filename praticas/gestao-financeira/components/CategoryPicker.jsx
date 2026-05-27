@@ -1,8 +1,11 @@
+import { useContext } from "react";
 import { Picker } from "@react-native-picker/picker";
-import { categories } from "../constants/categories";
 import { colors } from "../constants/colors";
+import { MoneyContext } from "../contexts/GlobalState";
 
 export default function CategoryPicker({ form, setForm }) {
+  const [, , categories] = useContext(MoneyContext);
+
   return (
     <Picker
       selectedValue={form.category}
@@ -11,7 +14,7 @@ export default function CategoryPicker({ form, setForm }) {
     >
       <Picker.Item
         label="Selecione uma Categoria"
-        value={null}
+        value=""
         enabled={false}
       />
       {categories.map((item, index) => (

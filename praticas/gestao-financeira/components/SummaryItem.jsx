@@ -1,7 +1,8 @@
+import { useContext } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 import CategoryItem from "./CategoryItem";
-import { categories } from "../constants/categories";
+import { MoneyContext } from "../contexts/GlobalState";
 import { globalStyles } from "../styles/globalStyles";
 
 /**
@@ -14,10 +15,15 @@ import { globalStyles } from "../styles/globalStyles";
  * @returns {JSX.Element} Container com ícone e textos.
  */
 export default function SummaryItem({ category, value }) {
-  const categoryConfig = categories.find((cat) => cat.name === category) ?? categories[0];
+  const [, , categories] = useContext(MoneyContext);
+  const categoryConfig = categories.find((cat) => cat.name === category) ?? {
+    displayName: category,
+    icon: "category",
+    background: "#ccc",
+  };
 
   const valueStyle =
-    category == "income"
+    category === "income"
       ? globalStyles.positiveText
       : globalStyles.negativeText;
 
@@ -29,7 +35,7 @@ export default function SummaryItem({ category, value }) {
           {categoryConfig.displayName}
         </Text>
         <Text style={valueStyle}>
-          {value.toLocaleString("pt-BR", {
+          {(Number(value) || 0).toLocaleString("pt-BR", {
             style: "currency",
             currency: "BRL",
           })}

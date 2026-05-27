@@ -1,6 +1,24 @@
-import { StyleSheet, Text, View, TouchableOpacity, Alert } from "react-native";
-import { globalStyles } from "../styles/globalStyles";
+import { useContext, useState } from "react";
+import {
+  Alert,
+  Modal,
+  Pressable,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { Picker } from "@react-native-picker/picker";
 import CategoryItem from "./CategoryItem";
+import DatePicker from "./DatePicker";
+import { MoneyContext } from "../contexts/GlobalState";
+import { globalStyles } from "../styles/globalStyles";
+import { setAsyncStorage } from "../utils/AsyncStorage";
+import { colors } from "../constants/colors";
+import CategoryPicker from "./CategoryPicker";
+import CurrencyInput from "./CurrencyInput";
+import DescriptionInput from "./DescriptionInput";
+import Button from "./Button";
 
 export default function TransactionItem({
   id,
@@ -11,54 +29,128 @@ export default function TransactionItem({
   setTransactions,
   transactions,
 }) {
+  const [showModal, setShowModal] = useState(false);
+  const [editForm, setEditForm] = useState({
+    id,
+    category,
+    date: date ? new Date(date) : new Date(),
+    description,
+    value: String(value),
+  });
+
   const valueStyle =
-    category == "income"
+    category === "income"
       ? globalStyles.positiveText
       : globalStyles.negativeText;
 
-  const handleTransaction = (item) => {
-    Alert.alert("Excluir Transação", "deseja excluir esta transação?", [
-      {
-        text: "Não",
-        style: "cancel"
-      },
-      {
-        text: "Sim",
-        style: "destructive",
-        onPress: () => deleteTransaction(item),
-      },
-    ]);
+  const openModal = () => {
+    setEditForm({
+      id,
+      category,
+      date: date ? new Date(date) : new Date(),
+      description,
+      value: String(value),
+    });
+    setShowModal(true);
   };
 
-  const deleteTransaction = async (item) => {
-    const updatedTransactions = transactions.filter(
-      (transaction) => transaction.id !== item.id,
+  const saveTransaction = async () => {
+    if (
+      !editForm.description ||
+      !editForm.value ||
+      !editForm.date ||
+      !editForm.category
+    ) {
+      Alert.alert(
+        "Atenção",
+        "Preencha todos os campos para salvar a transação.",
+      );
+      return;
+    }
+
+    const updatedTransactions = transactions.map((transaction) =>
+      transaction.id === id
+        ? {
+            ...transaction,
+            description: editForm.description,
+            value: Number(editForm.value),
+            category: editForm.category,
+            date: editForm.date,
+          }
+        : transaction,
     );
-    setTransactions(updatedTransactions); // Atualiza a memória RAM (Contexto)
-    await setAsyncStorage("transactions", updatedTransactions); // Atualiza a memória do Celular (Storage)
+
+    setTransactions(updatedTransactions);
+    await setAsyncStorage("transactions", updatedTransactions);
+    setShowModal(false);
+  };
+
+  const deleteTransaction = async () => {
+    const updatedTransactions = transactions.filter(
+      (transaction) => transaction.id !== id,
+    );
+    setTransactions(updatedTransactions);
+    await setAsyncStorage("transactions", updatedTransactions);
+    setShowModal(false);
   };
 
   return (
-    <TouchableOpacity onLongPress={() => handleTransaction({ id, category, date, description, value })}>
-      <View style={styles.itemContainer}>
-        <CategoryItem category={category} />
-        <View style={styles.textContainer}>
-          <Text style={globalStyles.secondaryText}>
-            {new Date(date).toLocaleDateString("pt-BR")}
-          </Text>
-          <View style={styles.bottomLineContainer}>
-            <Text style={globalStyles.primaryText}>{description}</Text>
-            <Text style={valueStyle}>
-              {value.toLocaleString("pt-BR", {
-                style: "currency",
-                currency: "BRL",
-              })}
+    <>
+      <TouchableOpacity onLongPress={openModal}>
+        <View style={styles.itemContainer}>
+          <CategoryItem category={category} />
+          <View style={styles.textContainer}>
+            <Text style={globalStyles.secondaryText}>
+              {new Date(date).toLocaleDateString("pt-BR")}
             </Text>
+            <View style={styles.bottomLineContainer}>
+              <Text style={globalStyles.primaryText}>{description}</Text>
+              <Text style={valueStyle}>
+                {Number(value).toLocaleString("pt-BR", {
+                  style: "currency",
+                  currency: "BRL",
+                })}
+              </Text>
+            </View>
           </View>
         </View>
-      </View>
-      <View style={globalStyles.line} />
-    </TouchableOpacity>
+        <View style={globalStyles.line} />
+      </TouchableOpacity>
+
+      <Modal visible={showModal} transparent animationType="slide">
+        <View style={globalStyles.overlay}>
+          <View style={globalStyles.modalContainer}>
+            <Text style={globalStyles.modalTitle}>Editar transação</Text>
+            <DescriptionInput
+              form={editForm}
+              setForm={setEditForm}
+              valueInputRef={null}
+            />
+            <CurrencyInput
+              form={editForm}
+              setForm={setEditForm}
+              valueInputRef={null}
+            />
+            <DatePicker form={editForm} setForm={setEditForm} />
+            <CategoryPicker form={editForm} setForm={setEditForm} />
+            <View style={styles.modalActions}>
+              <Button onPress={deleteTransaction} color={colors.negativesText}>
+                Excluir
+              </Button>
+              <Button onPress={saveTransaction} color={colors.primary}>
+                Salvar
+              </Button>
+            </View>
+            <Pressable
+              onPress={() => setShowModal(false)}
+              style={globalStyles.closeButton}
+            >
+              <Text style={globalStyles.closeButtonText}>Fechar</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
+    </>
   );
 }
 
@@ -80,5 +172,21 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",
+  },
+  modalForm: {
+    gap: 12,
+    borderRadius: 16,
+    padding: 20,
+    backgroundColor: colors.background,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "700",
+    marginBottom: 16,
+    color: colors.primaryText,
+  },
+  modalActions: {
+    flexDirection: "row",
+    gap: 8,
   },
 });

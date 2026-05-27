@@ -1,6 +1,7 @@
 import { MaterialIcons } from "@expo/vector-icons";
+import { useContext } from "react";
 import { StyleSheet, View } from "react-native";
-import { categories } from "../constants/categories";
+import { MoneyContext } from "../contexts/GlobalState";
 import { colors } from "../constants/colors";
 
 /**
@@ -13,7 +14,12 @@ import { colors } from "../constants/colors";
  * @returns {JSX.Element} View com ícone Material centrado.
  */
 export default function CategoryItem({ category }) {
-  const categoryConfig = categories.find((cat) => cat.name === category) ?? categories[0];
+  const [, , categories] = useContext(MoneyContext);
+  const categoryConfig =
+    categories.find((cat) => cat.name === category) ?? {
+      icon: "category",
+      background: colors.primary,
+    };
 
   return (
     <View

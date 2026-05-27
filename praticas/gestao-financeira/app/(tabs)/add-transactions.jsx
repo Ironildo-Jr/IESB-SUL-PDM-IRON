@@ -5,12 +5,15 @@ import {
   KeyboardAvoidingView,
   ScrollView,
   StyleSheet,
+  Text,
+  TouchableOpacity,
   TouchableWithoutFeedback,
   View,
 } from "react-native";
 import { globalStyles } from "../../styles/globalStyles";
 
 import Button from "../../components/Button";
+import CategoryManagerModal from "../../components/CategoryManagerModal";
 import CategoryPicker from "../../components/CategoryPicker";
 import CurrencyInput from "../../components/CurrencyInput";
 import DatePicker from "../../components/DatePicker";
@@ -18,6 +21,7 @@ import DescriptionInput from "../../components/DescriptionInput";
 import { setAsyncStorage } from "../../utils/AsyncStorage";
 
 import { MoneyContext } from "../../contexts/GlobalState";
+import { colors } from "../../constants/colors";
 
 const initialForm = {
   description: "",
@@ -30,6 +34,7 @@ export default function AddTransactions() {
   const [form, setForm] = useState(initialForm);
   const valueInputRef = useRef();
   const [transactions, setTransactions] = useContext(MoneyContext);
+  const [showCategoryManager, setShowCategoryManager] = useState(false);
 
   const addTransaction = async () => {
     if (!form.description || !form.value || !form.date || !form.category) {
@@ -39,13 +44,16 @@ export default function AddTransactions() {
       );
       return;
     }
-    // Cria a transação gerando um ID baseado no tamanho da lista
-    const newTransaction = { id: transactions.length + 1, ...form };
+
+    const newTransaction = {
+      id: transactions.length + 1,
+      ...form,
+    };
     const updatedTransactions = [...transactions, newTransaction];
 
-    setTransactions(updatedTransactions); // Atualiza a memória RAM (Contexto)
-    setForm(initialForm); // Limpa o formulário
-    await setAsyncStorage("transactions", updatedTransactions); // Atualiza a memória do Celular (Storage)
+    setTransactions(updatedTransactions);
+    setForm(initialForm);
+    await setAsyncStorage("transactions", updatedTransactions);
 
     Alert.alert("Sucesso!", "Transação adicionada com sucesso!");
   };
@@ -73,9 +81,20 @@ export default function AddTransactions() {
             <DatePicker form={form} setForm={setForm} />
 
             <CategoryPicker form={form} setForm={setForm} />
+
+            <TouchableOpacity
+              style={styles.manageButton}
+              onPress={() => setShowCategoryManager(true)}
+            >
+              <Text style={styles.manageButtonText}>Gerenciar categorias</Text>
+            </TouchableOpacity>
           </View>
 
           <Button onPress={addTransaction}>Adicionar</Button>
+          <CategoryManagerModal
+            visible={showCategoryManager}
+            onClose={() => setShowCategoryManager(false)}
+          />
         </ScrollView>
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
@@ -87,5 +106,18 @@ const styles = StyleSheet.create({
     gap: 12,
     marginBottom: 40,
     marginTop: 10,
+  },
+  manageButton: {
+    height: 44,
+    borderRadius: 8,
+    backgroundColor: colors.background,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 8,
+  },
+  manageButtonText: {
+    color: colors.primary,
+    fontWeight: "700",
+    fontSize: 16,
   },
 });

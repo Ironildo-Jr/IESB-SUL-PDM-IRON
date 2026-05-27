@@ -4,6 +4,7 @@ import { Picker } from "@react-native-picker/picker";
 import TransactionItem from "../../components/TransactionItem";
 import { colors } from "../../constants/colors";
 import { MoneyContext } from "../../contexts/GlobalState";
+import { AuthContext } from "../../contexts/AuthContext";
 import { globalStyles } from "../../styles/globalStyles";
 
 const monthNames = [
@@ -25,6 +26,7 @@ export default function Transactions() {
   const [transactions, setTransactions] = useContext(MoneyContext);
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const { user } = useContext(AuthContext);
 
   const filteredTransactions = useMemo(() => {
     return transactions.filter((item) => {
@@ -37,8 +39,22 @@ export default function Transactions() {
     });
   }, [transactions, selectedMonth, selectedYear]);
 
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return "Bom dia";
+    if (hour < 18) return "Boa tarde";
+    return "Boa noite";
+  };
+
   return (
     <View style={globalStyles.screenContainer}>
+      <View style={styles.welcomeContainer}>
+        <Text style={styles.greeting}>{getGreeting()}, {user?.name}! 👋</Text>
+        <Text style={styles.welcomeSubtitle}>
+          Acompanhe suas transações do mês
+        </Text>
+      </View>
+
       <View style={styles.filterRow}>
         <View style={styles.filterBlock}>
           <Picker
@@ -89,9 +105,29 @@ export default function Transactions() {
 }
 
 const styles = StyleSheet.create({
+  welcomeContainer: {
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    backgroundColor: colors.primary,
+    borderBottomLeftRadius: 12,
+    borderBottomRightRadius: 12,
+  },
+  greeting: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: colors.primaryContrast,
+    marginBottom: 4,
+  },
+  welcomeSubtitle: {
+    fontSize: 14,
+    color: colors.primaryContrast,
+    opacity: 0.9,
+  },
   filterRow: {
     flexDirection: "row",
     gap: 8,
+    paddingHorizontal: 20,
+    paddingVertical: 12,
   },
   filterBlock: {
     flex: 1,

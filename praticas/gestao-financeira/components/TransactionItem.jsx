@@ -1,8 +1,6 @@
 import { StyleSheet, Text, View, TouchableOpacity, Alert } from "react-native";
 import { globalStyles } from "../styles/globalStyles";
 import CategoryItem from "./CategoryItem";
-import { categories } from "../constants/categories";
-import { useNavigation } from "@react-navigation/native";
 
 export default function TransactionItem({
   id,
@@ -17,8 +15,6 @@ export default function TransactionItem({
     category == "income"
       ? globalStyles.positiveText
       : globalStyles.negativeText;
-
-  const navigation = useNavigation();
 
   const handleTransaction = (item) => {
     Alert.alert("Excluir Transação", "deseja excluir esta transação?", [

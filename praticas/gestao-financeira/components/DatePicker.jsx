@@ -20,7 +20,7 @@ export default function DatePicker({ form, setForm }) {
       <TextInput
         style={globalStyles.input}
         placeholder="Data da Transação"
-        value={form.date ? form.date.toLocaleDateString("pt-BR") : ""}
+        value={form.date ? new Date(form.date).toLocaleDateString("pt-BR") : ""}
         placeholderTextColor={colors.secondaryText}
         editable={false}
         onPressIn={() => setShowDatePicker(true)}
@@ -28,7 +28,7 @@ export default function DatePicker({ form, setForm }) {
       {showDatePicker && (
         <DateTimePicker
           mode="date"
-          value={form.date || new Date()}
+          value={form.date ? new Date(form.date) : new Date()}
           onChange={handleDateChange}
           accentColor={colors.primary}
           display={Platform.OS === "ios" ? "inline" : "default"}

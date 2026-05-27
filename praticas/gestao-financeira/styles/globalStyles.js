@@ -1,15 +1,15 @@
-import { StyleSheet } from "react-native"
-import { colors } from "../constants/colors"
+import { StyleSheet } from "react-native";
+import { colors } from "../constants/colors";
 
 export const globalStyles = StyleSheet.create({
   screenContainer: {
     display: "flex",
-    flex: 1
+    flex: 1,
   },
   content: {
     gap: 12,
     paddingVertical: 12,
-    paddingHorizontal: 20
+    paddingHorizontal: 20,
   },
   input: {
     height: 40,
@@ -23,18 +23,40 @@ export const globalStyles = StyleSheet.create({
   inputLabel: {
     fontSize: 20,
     color: colors.primaryText,
-    marginBottom: 4
+    marginBottom: 4,
   },
   button: {
     backgroundColor: colors.primary,
     paddingVertical: 12,
     paddingHorizontal: 20,
     borderRadius: 8,
-    alignItems: "center"
+    alignItems: "center",
   },
   buttonText: {
     color: colors.primaryContrast,
     fontSize: 22,
-    fontWeight: "bold"
-  }
-})
+    fontWeight: "bold",
+  },
+  line: {
+    backgroundColor: colors.secondaryText,
+    height: 1,
+    opacity: 0.5,
+    marginBottom: 4,
+  },
+  primaryText: {
+    fontSize: 16,
+    color: colors.primaryText,
+  },
+  secondaryText: {
+    fontSize: 12,
+    color: colors.secondaryText,
+  },
+  positiveText: {
+    fontSize: 16,
+    color: colors.positiveText,
+  },
+  negativeText: {
+    fontSize: 16,
+    color: colors.negativesText,
+  },
+});

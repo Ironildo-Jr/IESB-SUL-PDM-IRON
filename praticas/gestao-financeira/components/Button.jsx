@@ -2,10 +2,10 @@ import { StyleSheet, Text } from "react-native";
 import { TouchableHighlight } from "react-native";
 import { colors } from "../constants/colors";
 
-export default function Button({ children, onPress, color }) {
+export default function Button({ children, onPress, color, style: customStyle }) {
   return (
     <TouchableHighlight
-      style={[style.background, { backgroundColor: color ?? colors.primary }]}
+      style={[style.background, customStyle, { backgroundColor: color ?? colors.primary }]}
       onPress={onPress}
     >
       <Text style={style.text}>{children}</Text>
@@ -20,7 +20,8 @@ export const style = StyleSheet.create({
     justifyContent: "center",
     height: 44,
     borderRadius: 8,
-    flex: 1,
+    paddingHorizontal: 16,
+    minWidth: 120,
   },
   text: {
     color: colors.primaryContrast,

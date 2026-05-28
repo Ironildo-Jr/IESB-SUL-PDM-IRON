@@ -107,22 +107,22 @@ export default function Summary() {
     <ScrollView style={globalStyles.screenContainer}>
       <View style={globalStyles.content}>
         <View style={styles.filterRow}>
-          <View style={styles.filterBlock}>
+          <View style={{flex: 1}}>
             <Picker
               selectedValue={selectedMonth}
               onValueChange={(value) => setSelectedMonth(value)}
-              itemStyle={{ color: colors.primaryText }}
+              itemStyle={{ color: colors.primary }}
             >
               {monthNames.map((label, index) => (
                 <Picker.Item key={label} label={label} value={index} />
               ))}
             </Picker>
           </View>
-          <View style={styles.filterBlock}>
+          <View style={{flex: 1}}>
             <Picker
               selectedValue={selectedYear}
               onValueChange={(value) => setSelectedYear(value)}
-              itemStyle={{ color: colors.primaryText }}
+              itemStyle={{ color: colors.primary }}
             >
               {[new Date().getFullYear() - 1, new Date().getFullYear(), new Date().getFullYear() + 1].map(
                 (year) => (
@@ -192,10 +192,8 @@ export default function Summary() {
 const styles = StyleSheet.create({
    filterRow: {
     flexDirection: "row",
-    gap: 8,
-  },
-  filterBlock: {
-    flex: 1,
+    gap: 10,
+    paddingHorizontal: 30,
   },
   chartWrapper: {
     alignItems: "center",

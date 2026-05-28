@@ -1,5 +1,6 @@
 import { createContext, useEffect, useState } from "react";
 import { getAsyncStorage, setAsyncStorage } from "../utils/AsyncStorage";
+import { Alert } from "react-native";
 
 export const AuthContext = createContext();
 
@@ -8,25 +9,25 @@ export default function AuthProvider({ children }) {
   const [isHydrated, setIsHydrated] = useState(false);
 
   useEffect(() => {
-    const loadUser = async () => {
+    (async () => {
       const storedUser = await getAsyncStorage("user");
       if (storedUser && storedUser.name) {
         setUser(storedUser);
       }
       setIsHydrated(true);
-    };
-
-    loadUser();
+    })();
   }, []);
 
   const login = async (name, password) => {
     // Validação simples - pode ser expandida com autenticação backend
     if (!name || !password) {
-      throw new Error("Preencha todos os campos");
+      Alert.alert("Preencha todos os campos");
+      return;
     }
 
     if (password.length < 3) {
-      throw new Error("Senha deve ter pelo menos 3 caracteres");
+      Alert.alert("Senha deve ter pelo menos 3 caracteres");
+      return;
     }
 
     const userData = { name, password };

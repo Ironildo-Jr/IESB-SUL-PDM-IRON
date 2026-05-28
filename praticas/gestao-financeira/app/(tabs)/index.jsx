@@ -39,28 +39,21 @@ export default function Transactions() {
     });
   }, [transactions, selectedMonth, selectedYear]);
 
-  const getGreeting = () => {
-    const hour = new Date().getHours();
-    if (hour < 12) return "Bom dia";
-    if (hour < 18) return "Boa tarde";
-    return "Boa noite";
-  };
-
   return (
     <View style={globalStyles.screenContainer}>
       <View style={styles.welcomeContainer}>
-        <Text style={styles.greeting}>{getGreeting()}, {user?.name}! 👋</Text>
+        <Text style={styles.greeting}>Olá, {user?.name}!</Text>
         <Text style={styles.welcomeSubtitle}>
           Acompanhe suas transações do mês
         </Text>
       </View>
 
       <View style={styles.filterRow}>
-        <View style={styles.filterBlock}>
+        <View style={{flex: 1}}>
           <Picker
             selectedValue={selectedMonth}
             onValueChange={(value) => setSelectedMonth(value)}
-            itemStyle={{ color: colors.primaryText }}
+            itemStyle={{ color: colors.primary }}
           >
             {monthNames.map((label, index) => (
               <Picker.Item key={label} label={label} value={index} />
@@ -68,11 +61,11 @@ export default function Transactions() {
           </Picker>
         </View>
 
-        <View style={styles.filterBlock}>
+        <View style={{flex: 1}}>
           <Picker
             selectedValue={selectedYear}
             onValueChange={(value) => setSelectedYear(value)}
-            itemStyle={{ color: colors.primaryText }}
+            itemStyle={{ color: colors.primary }}
           >
             {[new Date().getFullYear() - 1, new Date().getFullYear(), new Date().getFullYear() + 1].map(
               (year) => (
@@ -108,29 +101,24 @@ const styles = StyleSheet.create({
   welcomeContainer: {
     paddingHorizontal: 20,
     paddingVertical: 16,
-    backgroundColor: colors.primary,
     borderBottomLeftRadius: 12,
     borderBottomRightRadius: 12,
   },
   greeting: {
     fontSize: 24,
     fontWeight: "bold",
-    color: colors.primaryContrast,
+    color: colors.primaryText,
     marginBottom: 4,
   },
   welcomeSubtitle: {
     fontSize: 14,
-    color: colors.primaryContrast,
+    color: colors.primaryText,
     opacity: 0.9,
   },
   filterRow: {
     flexDirection: "row",
-    gap: 8,
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-  },
-  filterBlock: {
-    flex: 1,
+    gap: 10,
+    paddingHorizontal: 30,
   },
   transactionItem: {
     flexDirection: "row",

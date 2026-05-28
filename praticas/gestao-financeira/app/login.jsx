@@ -1,12 +1,13 @@
 import { useContext, useState } from "react";
 import {
   Alert,
+  Image,
   Keyboard,
   KeyboardAvoidingView,
+  Platform,
   StyleSheet,
   Text,
   TextInput,
-  TouchableOpacity,
   TouchableWithoutFeedback,
   View,
 } from "react-native";
@@ -34,10 +35,10 @@ export default function LoginScreen() {
     }
   };
 
-  const handleDemoLogin = async () => {
+  const handleGuestLogin = async () => {
     try {
       setLoading(true);
-      await login("Demo User", "demo123");
+      await login("Visitante", "1234");
       setName("");
       setPassword("");
     } catch (error) {
@@ -50,51 +51,38 @@ export default function LoginScreen() {
   return (
     <KeyboardAvoidingView
       style={styles.container}
-      behavior="padding"
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.inner}>
           <View style={styles.logoContainer}>
-            <Text style={styles.logo}>💰</Text>
-            <Text style={styles.title}>Gestor Financeiro</Text>
+            <Image
+              source={require("../assets/images/icon.png")}
+              style={styles.logo}
+            />
+            <Text style={styles.title}>Gestão Financeira</Text>
             <Text style={styles.subtitle}>Gerencie suas transações</Text>
           </View>
 
           <View style={styles.formContainer}>
-            <View style={styles.inputGroup}>
-              <Text style={globalStyles.inputLabel}>Nome</Text>
-              <TextInput
-                style={globalStyles.input}
-                placeholder="Digite seu nome"
-                placeholderTextColor={colors.secondaryText}
-                value={name}
-                onChangeText={setName}
-                editable={!loading}
-              />
-            </View>
+            <TextInput
+              style={globalStyles.input}
+              placeholder="Digite seu nome"
+              placeholderTextColor={colors.secondaryText}
+              value={name}
+              onChangeText={setName}
+            />
 
-            <View style={styles.inputGroup}>
-              <Text style={globalStyles.inputLabel}>Senha</Text>
-              <TextInput
-                style={globalStyles.input}
-                placeholder="Digite sua senha"
-                placeholderTextColor={colors.secondaryText}
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry
-                editable={!loading}
-              />
-              <Text style={styles.hint}>Mínimo 3 caracteres</Text>
-            </View>
+            <TextInput
+              style={globalStyles.input}
+              placeholder="Digite sua senha"
+              placeholderTextColor={colors.secondaryText}
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+            />
 
-            <View style={styles.buttonContainer}>
-              <Button
-                onPress={handleLogin}
-                disabled={loading || !name || !password}
-              >
-                {loading ? "Entrando..." : "Entrar"}
-              </Button>
-            </View>
+            <Button onPress={handleLogin}>Entrar</Button>
 
             <View style={styles.divider}>
               <View style={styles.line} />
@@ -102,19 +90,12 @@ export default function LoginScreen() {
               <View style={styles.line} />
             </View>
 
-            <TouchableOpacity
-              style={styles.demoButton}
-              onPress={handleDemoLogin}
-              disabled={loading}
+            <Button
+              color={colors.secondaryText}
+              onPress={handleGuestLogin}
             >
-              <Text style={styles.demoButtonText}>Entrar com Demo</Text>
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.footer}>
-            <Text style={styles.footerText}>
-              Demo: use qualquer nome e senha com 3+ caracteres
-            </Text>
+              Entrar como Visitante
+            </Button>
           </View>
         </View>
       </TouchableWithoutFeedback>
@@ -125,52 +106,37 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
   },
   inner: {
     flex: 1,
-    justifyContent: "space-between",
+    justifyContent: "center",
+    gap: 80,
     paddingHorizontal: 20,
-    paddingVertical: 40,
   },
   logoContainer: {
     alignItems: "center",
-    marginTop: 60,
+    gap: 12,
   },
   logo: {
-    fontSize: 80,
-    marginBottom: 16,
+    width: 100,
+    height: 100,
   },
   title: {
-    fontSize: 28,
+    fontSize: 30,
     fontWeight: "bold",
     color: colors.primaryText,
-    marginBottom: 8,
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: 20,
     color: colors.secondaryText,
   },
   formContainer: {
-    flex: 1,
-    justifyContent: "center",
     gap: 16,
-  },
-  inputGroup: {
-    gap: 8,
-  },
-  hint: {
-    fontSize: 12,
-    color: colors.secondaryText,
-    marginTop: 4,
-  },
-  buttonContainer: {
-    marginTop: 8,
+    width: "100%",
   },
   divider: {
     flexDirection: "row",
     alignItems: "center",
-    marginVertical: 16,
     gap: 12,
   },
   line: {
@@ -181,28 +147,6 @@ const styles = StyleSheet.create({
   },
   dividerText: {
     color: colors.secondaryText,
-    fontSize: 14,
-  },
-  demoButton: {
-    backgroundColor: colors.background,
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-    borderWidth: 2,
-    borderColor: colors.primary,
-    alignItems: "center",
-  },
-  demoButtonText: {
-    color: colors.primary,
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  footer: {
-    alignItems: "center",
-  },
-  footerText: {
-    fontSize: 12,
-    color: colors.secondaryText,
-    textAlign: "center",
+    fontSize: 18,
   },
 });

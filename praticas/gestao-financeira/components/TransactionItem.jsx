@@ -35,24 +35,13 @@ export default function TransactionItem({
     category,
     date: date ? new Date(date) : new Date(),
     description,
-    value: String(value),
+    value: Number(value),
   });
 
   const valueStyle =
     category === "income"
       ? globalStyles.positiveText
       : globalStyles.negativeText;
-
-  const openModal = () => {
-    setEditForm({
-      id,
-      category,
-      date: date ? new Date(date) : new Date(),
-      description,
-      value: String(value),
-    });
-    setShowModal(true);
-  };
 
   const saveTransaction = async () => {
     if (
@@ -96,7 +85,7 @@ export default function TransactionItem({
 
   return (
     <>
-      <TouchableOpacity onLongPress={openModal}>
+      <TouchableOpacity onLongPress={() => setShowModal(true)}>
         <View style={styles.itemContainer}>
           <CategoryItem category={category} />
           <View style={styles.textContainer}>
@@ -106,7 +95,7 @@ export default function TransactionItem({
             <View style={styles.bottomLineContainer}>
               <Text style={globalStyles.primaryText}>{description}</Text>
               <Text style={valueStyle}>
-                {Number(value).toLocaleString("pt-BR", {
+                {value.toLocaleString("pt-BR", {
                   style: "currency",
                   currency: "BRL",
                 })}
@@ -134,10 +123,18 @@ export default function TransactionItem({
             <DatePicker form={editForm} setForm={setEditForm} />
             <CategoryPicker form={editForm} setForm={setEditForm} />
             <View style={styles.modalActions}>
-              <Button onPress={deleteTransaction} color={colors.negativesText}>
+              <Button
+                style={styles.modalButton}
+                onPress={deleteTransaction}
+                color={colors.negativesText}
+              >
                 Excluir
               </Button>
-              <Button onPress={saveTransaction} color={colors.primary}>
+              <Button
+                style={styles.modalButton}
+                onPress={saveTransaction}
+                color={colors.primary}
+              >
                 Salvar
               </Button>
             </View>
@@ -188,5 +185,8 @@ const styles = StyleSheet.create({
   modalActions: {
     flexDirection: "row",
     gap: 8,
+  },
+  modalButton: {
+    flex: 1,
   },
 });

@@ -1,12 +1,9 @@
+import { Stack, useRouter } from "expo-router";
 import { useContext, useEffect } from "react";
-import { Stack } from "expo-router";
-import { StatusBar } from "expo-status-bar";
-import { useRouter } from "expo-router";
 import "react-native-reanimated";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { colors } from "../constants/colors";
-import GlobalState from "../contexts/GlobalState";
 import AuthProvider, { AuthContext } from "../contexts/AuthContext";
+import GlobalState from "../contexts/GlobalState";
 
 function RootLayoutContent() {
   const router = useRouter();
@@ -28,13 +25,11 @@ function RootLayoutContent() {
 
   return (
     <SafeAreaProvider>
-      <StatusBar backgroundColor={colors.primary} style="light" />
       <Stack>
         <Stack.Screen name="login" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="+not-found" />
       </Stack>
-      <StatusBar style="auto" />
     </SafeAreaProvider>
   );
 }

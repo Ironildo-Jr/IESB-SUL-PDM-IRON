@@ -10,7 +10,7 @@ import { AuthContext } from "../../contexts/AuthContext";
 export default function TabsLayout() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { user, logout } = useContext(AuthContext);
+  const { logout } = useContext(AuthContext);
 
   const handleLogout = () => {
     Alert.alert(
@@ -67,7 +67,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: `Bem-vindo, ${user?.name}!`,
+          title: "Transações",
           tabBarIcon: ({ color }) => (
             <MaterialIcons name="attach-money" size={28} color={color} />
           ),

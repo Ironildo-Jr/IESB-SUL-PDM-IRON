@@ -1,0 +1,188 @@
+{
+  "info": {
+    "name": "gestao-financeira-api",
+    "_postman_id": "d3b9f8a6-0000-4f2a-9f9a-1d2b3c4e5f6a",
+    "description": "Collection para testar a API gestao-financeira",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "categoryId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "transactionId",
+      "value": "1",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/",
+        "description": "Verifica se a API está viva. Resposta esperada: { \"ok\": true, \"name\": \"gestao-financeira-api\" }"
+      }
+    },
+    {
+      "name": "List Categories",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/categories",
+        "description": "Retorna as categorias (seed + user)."
+      }
+    },
+    {
+      "name": "Create Category",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"health\",\n  \"displayName\": \"Saúde\",\n  \"icon\": \"favorite\",\n  \"background\": \"#FFB6B6\",\n  \"isIncome\": false\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": "{{baseUrl}}/categories",
+        "description": "Cria uma nova categoria. Resposta: 201 com o objeto criado incluindo id."
+      }
+    },
+    {
+      "name": "Update Category",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"displayName\": \"Saúde e Bem-estar\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": "{{baseUrl}}/categories/{{categoryId}}",
+        "description": "Atualiza apenas o campo fornecido. Use a variável {{categoryId}}."
+      }
+    },
+    {
+      "name": "Delete Category",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": "{{baseUrl}}/categories/{{categoryId}}",
+        "description": "Deleta a categoria indicada por {{categoryId}}. Atenção: categorias seed não podem ser deletadas (retorna 400)."
+      }
+    },
+    {
+      "name": "Create Transaction",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"description\": \"Salário de outubro\",\n  \"value\": 3500.50,\n  \"date\": \"2026-04-29\",\n  \"categoryId\": 1\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": "{{baseUrl}}/transactions",
+        "description": "Cria uma transação; resposta 201 com objeto e category aninhada."
+      }
+    },
+    {
+      "name": "Create Transaction (Invalid)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"description\": \"\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": "{{baseUrl}}/transactions",
+        "description": "Exemplo de body inválido que deve retornar 400 com detalhes."
+      }
+    },
+    {
+      "name": "List Transactions",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/transactions",
+        "description": "Lista transações com category expandida."
+      }
+    },
+    {
+      "name": "Delete Transaction",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": "{{baseUrl}}/transactions/{{transactionId}}",
+        "description": "Deleta a transação indicada por {{transactionId}}; retorna 204."
+      }
+    }
+    ,
+    {
+      "name": "Update Transaction",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"description\": \"Salário (ajuste)\",\n  \"value\": 3600.0,\n  \"date\": \"2026-04-30\",\n  \"categoryId\": 1\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": "{{baseUrl}}/transactions/{{transactionId}}",
+        "description": "Atualiza a transação indicada por {{transactionId}}; pode enviar apenas os campos a alterar."
+      }
+    }
+  ]
+}

@@ -8,8 +8,8 @@ export default function CategoryPicker({ form, setForm }) {
 
   return (
     <Picker
-      selectedValue={form.category}
-      onValueChange={(value) => setForm({ ...form, category: value })}
+      selectedValue={form.category !== undefined && form.category !== null ? String(form.category) : ""}
+      onValueChange={(value) => setForm({ ...form, category: String(value) })}
       itemStyle={{ color: colors.primaryText }}
     >
       <Picker.Item
@@ -17,9 +17,11 @@ export default function CategoryPicker({ form, setForm }) {
         value=""
         enabled={false}
       />
-      {categories.map((item, index) => (
-        <Picker.Item key={index} label={item.displayName} value={item.name} />
-      ))}
+      {categories.map((item) => {
+        const value = item.id !== undefined && item.id !== null ? String(item.id) : String(item.name);
+        const key = item.id !== undefined && item.id !== null ? String(item.id) : String(item.name);
+        return <Picker.Item key={key} label={item.displayName} value={value} />;
+      })}
     </Picker>
   );
 }

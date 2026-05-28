@@ -15,11 +15,23 @@ import { colors } from "../constants/colors";
  */
 export default function CategoryItem({ category }) {
   const [, , categories] = useContext(MoneyContext);
-  const categoryConfig =
-    categories.find((cat) => cat.name === category) ?? {
-      icon: "category",
-      background: colors.primary,
-    };
+
+  // category can be: name (string), id (number or numeric string), or object { id, name }
+  let keyName = null;
+  if (category && typeof category === "object") {
+    keyName = category.name;
+  } else if (category !== undefined && category !== null && !Number.isNaN(Number(category))) {
+    const asId = Number(category);
+    const foundById = categories.find((cat) => cat.id === asId);
+    keyName = foundById ? foundById.name : String(category);
+  } else {
+    keyName = String(category);
+  }
+
+  const categoryConfig = categories.find((cat) => cat.name === keyName) ?? {
+    icon: "category",
+    background: colors.primary,
+  };
 
   return (
     <View

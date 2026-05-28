@@ -7,14 +7,14 @@ import {
   StyleSheet,
   Text,
   TextInput,
-  TouchableOpacity,
   View,
 } from "react-native";
-import { MoneyContext } from "../contexts/GlobalState";
-import { globalStyles } from "../styles/globalStyles";
 import { colors } from "../constants/colors";
-import CategoryItem from "./CategoryItem";
+import { MoneyContext } from "../contexts/GlobalState";
+import api from "../services/api";
+import { globalStyles } from "../styles/globalStyles";
 import Button from "./Button";
+import CategoryItem from "./CategoryItem";
 
 const normalizeCategoryName = (value) =>
   value.trim().toLowerCase().replace(/\s+/g, "-");
@@ -39,16 +39,27 @@ export default function CategoryManagerModal({ visible, onClose }) {
       return;
     }
 
-    const newCategory = {
+    const payload = {
       name: slug,
       displayName: displayName.trim(),
       icon: "category",
       background: colors.primary,
+      isIncome: false,
     };
 
-    setCategories([...categories, newCategory]);
-    setName("");
-    setDisplayName("");
+    api
+      .createCategory(payload)
+      .then((created) => {
+        setCategories([...categories, created]);
+        setName("");
+        setDisplayName("");
+      })
+      .catch((err) => {
+        Alert.alert(
+          "Erro",
+          "Não foi possível criar a categoria.\n" + (err.message || ""),
+        );
+      });
   };
 
   return (

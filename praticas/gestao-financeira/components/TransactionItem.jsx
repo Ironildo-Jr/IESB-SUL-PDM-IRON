@@ -12,6 +12,7 @@ import { Picker } from "@react-native-picker/picker";
 import CategoryItem from "./CategoryItem";
 import DatePicker from "./DatePicker";
 import { MoneyContext } from "../contexts/GlobalState";
+import api from "../services/api";
 import { globalStyles } from "../styles/globalStyles";
 import { setAsyncStorage } from "../utils/AsyncStorage";
 import { colors } from "../constants/colors";
@@ -30,18 +31,31 @@ export default function TransactionItem({
   transactions,
 }) {
   const [showModal, setShowModal] = useState(false);
+  const [, , categories] = useContext(MoneyContext);
+
+  const computeInitialCategoryValue = () => {
+    if (typeof category === "object" && category !== null) {
+      // prefer id if categories list has ids, otherwise fall back to name
+      const hasIdInCategories = categories.some((c) => c.id !== undefined && c.id !== null);
+      return hasIdInCategories ? String(category.id) : String(category.name);
+    }
+    if (typeof category === "number") {
+      return String(category);
+    }
+    return category;
+  };
+
   const [editForm, setEditForm] = useState({
     id,
-    category,
+    category: computeInitialCategoryValue(),
     date: date ? new Date(date) : new Date(),
     description,
     value: Number(value),
   });
 
-  const valueStyle =
-    category === "income"
-      ? globalStyles.positiveText
-      : globalStyles.negativeText;
+  const categoryName = typeof category === "object" && category !== null ? category.name : String(category);
+
+  const valueStyle = categoryName === "income" ? globalStyles.positiveText : globalStyles.negativeText;
 
   const saveTransaction = async () => {
     if (
@@ -57,37 +71,56 @@ export default function TransactionItem({
       return;
     }
 
-    const updatedTransactions = transactions.map((transaction) =>
-      transaction.id === id
-        ? {
-            ...transaction,
-            description: editForm.description,
-            value: Number(editForm.value),
-            category: editForm.category,
-            date: editForm.date,
-          }
-        : transaction,
-    );
+    try {
+      let payload = null;
+      try { console.log('[TransactionItem] save payload (preparing) editForm:', editForm); } catch (e) {}
 
-    setTransactions(updatedTransactions);
-    await setAsyncStorage("transactions", updatedTransactions);
-    setShowModal(false);
+      let categoryIdToSend = Number(editForm.category);
+      if (Number.isNaN(categoryIdToSend)) {
+        const found = categories.find((c) => c.name === editForm.category);
+        categoryIdToSend = found ? found.id : NaN;
+      }
+
+      payload = {
+        description: editForm.description,
+        value: Number(editForm.value),
+        // ensure date is YYYY-MM-DD string
+        date: editForm.date instanceof Date ? editForm.date.toISOString().slice(0, 10) : editForm.date,
+        categoryId: categoryIdToSend,
+      };
+      try { console.log('[TransactionItem] create/update payload:', payload); } catch (e) {}
+
+      const updated = await api.updateTransaction(id, payload);
+
+      const updatedTransactions = transactions.map((transaction) =>
+        transaction.id === id ? updated : transaction,
+      );
+
+      setTransactions(updatedTransactions);
+      await setAsyncStorage("transactions", updatedTransactions);
+      setShowModal(false);
+    } catch (err) {
+      Alert.alert("Erro", "Não foi possível salvar a transação.\n" + (err.message || ""));
+    }
   };
 
   const deleteTransaction = async () => {
-    const updatedTransactions = transactions.filter(
-      (transaction) => transaction.id !== id,
-    );
-    setTransactions(updatedTransactions);
-    await setAsyncStorage("transactions", updatedTransactions);
-    setShowModal(false);
+    try {
+      await api.deleteTransaction(id);
+      const updatedTransactions = transactions.filter((transaction) => transaction.id !== id);
+      setTransactions(updatedTransactions);
+      await setAsyncStorage("transactions", updatedTransactions);
+      setShowModal(false);
+    } catch (err) {
+      Alert.alert("Erro", "Não foi possível excluir a transação.\n" + (err.message || ""));
+    }
   };
 
   return (
     <>
       <TouchableOpacity onLongPress={() => setShowModal(true)}>
         <View style={styles.itemContainer}>
-          <CategoryItem category={category} />
+          <CategoryItem category={categoryName} />
           <View style={styles.textContainer}>
             <Text style={globalStyles.secondaryText}>
               {new Date(date).toLocaleDateString("pt-BR")}

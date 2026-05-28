@@ -19,6 +19,7 @@ import CurrencyInput from "../../components/CurrencyInput";
 import DatePicker from "../../components/DatePicker";
 import DescriptionInput from "../../components/DescriptionInput";
 import { setAsyncStorage } from "../../utils/AsyncStorage";
+import api from "../../services/api";
 
 import { MoneyContext } from "../../contexts/GlobalState";
 import { colors } from "../../constants/colors";
@@ -45,17 +46,23 @@ export default function AddTransactions() {
       return;
     }
 
-    const newTransaction = {
-      id: transactions.length + 1,
-      ...form,
-    };
-    const updatedTransactions = [...transactions, newTransaction];
-
-    setTransactions(updatedTransactions);
-    setForm(initialForm);
-    await setAsyncStorage("transactions", updatedTransactions);
-
-    Alert.alert("Sucesso!", "Transação adicionada com sucesso!");
+    try {
+      const payload = {
+        description: form.description,
+        value: Number(form.value),
+        date: form.date,
+        categoryId: Number(form.category),
+      };
+      try { console.log('[AddTransactions] create payload:', payload); } catch (e) {}
+      const created = await api.createTransaction(payload);
+      const updatedTransactions = [...transactions, created];
+      setTransactions(updatedTransactions);
+      setForm(initialForm);
+      await setAsyncStorage("transactions", updatedTransactions);
+      Alert.alert("Sucesso!", "Transação adicionada com sucesso!");
+    } catch (err) {
+      Alert.alert("Erro", "Não foi possível adicionar transação.\n" + (err.message || ""));
+    }
   };
 
   return (

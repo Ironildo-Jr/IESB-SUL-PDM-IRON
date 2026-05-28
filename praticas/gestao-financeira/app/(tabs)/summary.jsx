@@ -66,15 +66,22 @@ export default function Summary() {
     }, { sum: 0 });
 
     for (const item of filteredTransactions) {
-      const categoryName = item.category;
-      const value = Number(item.value) || 0;
+        const categoryName = item.category && typeof item.category === "object"
+          ? item.category.name
+          : String(item.category);
+        const value = Number(item.value) || 0;
 
-      if (totalsObject[categoryName] === undefined) {
-        totalsObject[categoryName] = 0;
-      }
+        if (totalsObject[categoryName] === undefined) {
+          totalsObject[categoryName] = 0;
+        }
 
-      totalsObject[categoryName] += value;
-      totalsObject.sum += categoryName === "income" ? value : -value;
+        totalsObject[categoryName] += value;
+
+        const isIncome = item.category && typeof item.category === "object"
+          ? Boolean(item.category.isIncome)
+          : (categories.find((c) => c.name === categoryName)?.isIncome ?? false);
+
+        totalsObject.sum += isIncome ? value : -value;
     }
 
     return totalsObject;

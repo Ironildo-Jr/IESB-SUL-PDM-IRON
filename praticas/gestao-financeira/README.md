@@ -1,3 +1,68 @@
+# Gestão Financeira — Frontend (Expo / React Native)
+
+Resumo
+- Aplicativo móvel feito com Expo + React Native e `expo-router`.
+- Usa `AsyncStorage` para cache local e consome a API em `../gestao-financeira-api`.
+
+Principais tecnologias
+- Expo (React Native)
+- React 19
+- expo-router, @react-native-async-storage/async-storage
+- @react-native-picker/picker
+
+Pré-requisitos
+- Node.js (recomendado >= 18)
+- npm ou yarn
+- Expo CLI (opcional): `npm install -g expo-cli` ou use `npx expo` diretamente
+- Emulador Android / Xcode (opcional) ou dispositivo físico com o app Expo Go
+
+Instalação
+1. Entrar na pasta do frontend:
+
+```
+cd praticas/gestao-financeira
+```
+2. Instalar dependências:
+
+```
+npm install
+```
+
+Como executar
+- Iniciar o Metro/Expo:
+
+```
+npm run start
+# ou
+npx expo start
+```
+
+- Para abrir no emulador:
+
+```
+npm run android
+npm run ios
+```
+
+Conectar ao backend (dicas)
+- O frontend usa a constante `BASE_URL` definida em `praticas/gestao-financeira/services/api.js` — altere somente esse valor para apontar para o backend quando testar em dispositivos físicos, por exemplo `http://<SEU-PC-IP>:3000`.
+- Alternativas: rodar `npx localtunnel --port 3000 --subdomain <nome>` ou `ngrok` e então atualizar `BASE_URL` no arquivo `services/api.js` com a URL pública.
+- Backend padrão: `praticas/gestao-financeira-api` (porta 3000).
+
+API consumida
+- Endpoints principais (backend):
+  - `GET /categories` — lista categorias
+  - `POST /categories` — cria categoria
+  - `PUT /categories/:id` — atualiza categoria
+  - `DELETE /categories/:id` — remove categoria
+  - `GET /transactions` — lista transações
+  - `POST /transactions` — cria transação
+  - `PUT /transactions/:id` — atualiza transação
+  - `DELETE /transactions/:id` — remove transação
+
+Observações
+- Ao enviar/atualizar transações, garanta que o payload contenha `description` (string, não vazio), `amount` (número), `date` (YYYY-MM-DD) e `categoryId` (número).
+- Se encontrar problemas de rede no dispositivo, verifique o IP do PC, regras de firewall e as alternativas de túnel.
 # Welcome to your Expo app 👋
 
 This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).

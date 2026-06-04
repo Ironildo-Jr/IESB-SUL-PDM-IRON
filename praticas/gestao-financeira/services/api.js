@@ -1,4 +1,4 @@
-const BASE_URL = "https://cowardly-lionfish-90.loca.lt";
+const BASE_URL = "http://172.27.2.128:3000";
 
 // Debug: print base URL at startup so device logs reveal where requests go
 try {
@@ -8,12 +8,14 @@ try {
 async function request(path, options = {}) {
   const url = `${BASE_URL}${path}`;
   const config = { headers: { "Content-Type": "application/json" }, ...options };
+  const rawBody = config.body;
   if (config.body && typeof config.body !== "string") {
     config.body = JSON.stringify(config.body);
   }
 
   try {
     console.log("[api] request:", config.method || "GET", url);
+    console.log("[api] body:", rawBody);
   } catch (e) {}
 
   const res = await fetch(url, config).catch((err) => {

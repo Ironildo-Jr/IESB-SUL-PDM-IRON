@@ -34,7 +34,7 @@ const initialForm = {
 export default function AddTransactions() {
   const [form, setForm] = useState(initialForm);
   const valueInputRef = useRef();
-  const [transactions, setTransactions] = useContext(MoneyContext);
+  const [transactions, setTransactions, categories] = useContext(MoneyContext);
   const [showCategoryManager, setShowCategoryManager] = useState(false);
 
   const addTransaction = async () => {
@@ -47,11 +47,17 @@ export default function AddTransactions() {
     }
 
     try {
+      let categoryIdToSend = Number(form.category);
+      if (Number.isNaN(categoryIdToSend)) {
+        const found = categories.find((c) => c.name === form.category);
+        categoryIdToSend = found ? found.id : NaN;
+      }
+
       const payload = {
         description: form.description,
         value: Number(form.value),
         date: form.date,
-        categoryId: Number(form.category),
+        categoryId: Number.isNaN(categoryIdToSend) ? null : categoryIdToSend,
       };
       try { console.log('[AddTransactions] create payload:', payload); } catch (e) {}
       const created = await api.createTransaction(payload);

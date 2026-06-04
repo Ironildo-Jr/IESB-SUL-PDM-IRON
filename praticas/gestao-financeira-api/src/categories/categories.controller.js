@@ -59,30 +59,59 @@ function listCategories(req, res) {
 }
 
 function createCategory(req, res) {
-  const db = getDb();
-  const payload = req.body;
-  const errors = validateCategoryPayload(payload);
+  try {
+    const db = getDb();
+    const payload = req.body;
+    console.log("[categories] createCategory payload:", payload);
 
-  if (errors.length > 0) {
-    return sendInvalidData(res, errors);
+    const errors = validateCategoryPayload(payload);
+
+    if (errors.length > 0) {
+      console.error("[categories] validation errors:", errors, "payload:", payload);
+      return sendInvalidData(res, errors);
+    }
+
+    const stmt = db.prepare(
+      `INSERT INTO categories (name, displayName, icon, background, isIncome, isSeed)
+       VALUES (?, ?, ?, ?, ?, 0)`
+    );
+
+    const params = [
+      String(payload.name).trim(),
+      String(payload.displayName).trim(),
+      String(payload.icon).trim(),
+      String(payload.background).trim(),
+      payload.isIncome ? 1 : 0,
+    ];
+
+    try {
+      console.log("[categories] insert params:", params);
+    } catch (e) {}
+
+    let info;
+    try {
+      info = stmt.run(params);
+    } catch (err) {
+      console.error("[categories] stmt.run error:", err && err.message ? err.message : err);
+      console.error("payload for insert:", payload);
+      return res.status(500).json({ error: "Erro ao inserir categoria", details: err && err.message ? err.message : String(err) });
+    }
+
+    try {
+      saveDb();
+    } catch (e) {
+      console.error("[categories] saveDb error:", e && e.message ? e.message : e);
+      return res.status(500).json({ error: "Erro ao salvar categoria", details: (e && e.message) || String(e) });
+    }
+
+    const created = db.prepare("SELECT id, name, displayName, icon, background, isIncome FROM categories WHERE id = ?").get(info.lastInsertRowid);
+    res.status(201).json({ ...created, isIncome: Boolean(created.isIncome) });
+    return;
+  } catch (err) {
+    console.error("[categories] unexpected error:", err && err.message ? err.message : err);
+    console.error(err && err.stack ? err.stack : err);
+    return res.status(500).json({ error: "Erro inesperado ao criar categoria", details: err && err.message ? err.message : String(err) });
   }
-
-  const stmt = db.prepare(
-    `INSERT INTO categories (name, displayName, icon, background, isIncome, isSeed)
-     VALUES (?, ?, ?, ?, ?, 0)`
-  );
-  const info = stmt.run(
-    payload.name.trim(),
-    payload.displayName.trim(),
-    payload.icon.trim(),
-    payload.background.trim(),
-    payload.isIncome ? 1 : 0
-  );
-
-  saveDb();
-
-  const created = db.prepare("SELECT id, name, displayName, icon, background, isIncome FROM categories WHERE id = ?").get(info.lastInsertRowid);
-  res.status(201).json({ ...created, isIncome: Boolean(created.isIncome) });
 }
 
 function updateCategory(req, res) {

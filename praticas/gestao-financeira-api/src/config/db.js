@@ -41,6 +41,32 @@ async function initDb() {
   if (fs.existsSync(databasePath)) {
     const fileBuffer = fs.readFileSync(databasePath);
     dbInstance = new SQL.Database(new Uint8Array(fileBuffer));
+    // Re-apply schema (INSERT OR IGNORE for seed rows) to ensure seeds exist
+    try {
+      const schema = loadSchema();
+      dbInstance.exec(schema);
+      // Ensure sqlite_sequence for categories is at least the current max id
+      try {
+        const res = dbInstance.exec("SELECT MAX(id) as maxId FROM categories");
+        const maxId = (res && res[0] && res[0].values && res[0].values[0] && res[0].values[0][0]) || 0;
+        if (maxId && Number(maxId) > 0) {
+          // update sqlite_sequence if present
+          try {
+            dbInstance.exec(`UPDATE sqlite_sequence SET seq = ${Number(maxId)} WHERE name = 'categories';`);
+          } catch (e) {
+            // sqlite_sequence may not exist or update may fail; ignore safely
+          }
+        }
+      } catch (e) {
+        // ignore
+      }
+      // persist possible inserted seeds
+      const binaryArrayAfter = dbInstance.export();
+      fs.writeFileSync(databasePath, Buffer.from(binaryArrayAfter));
+    } catch (e) {
+      // ignore schema re-apply errors but log
+      try { console.error('[initDb] error re-applying schema:', e && e.message ? e.message : e); } catch (ee) {}
+    }
   } else {
     dbInstance = new SQL.Database();
     const schema = loadSchema();

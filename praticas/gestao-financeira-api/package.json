@@ -1,0 +1,13 @@
+{
+  "name": "gestao-financeira-api",
+  "version": "1.0.0",
+  "description": "Backend em Node + Express com SQLite em WASM e persistência em arquivo.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "express": "^4.18.4",
+    "sql.js": "^1.8.0"
+  }
+}
